@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  main:
+    container_name: nestjs-e2e-main
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    command: yarn start:debug
+    volumes:
+      - .:/usr/src/app
+      - ./node_modules:/usr/src/app/node_modules
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - 9229:9229
+    env_file:
+      - .env
+    environment:
+      - "DB_HOST=postgres"
+      - "DB_PORT=5432"
+    networks:
+      - nestjs-e2e-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:12
+    container_name: nestjs-e2e-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - ${DB_PORT}:5432
+    networks:
+      - nestjs-e2e-network
+    volumes:
+      - nestjs-e2e-postgres-volume:/data
+    restart: unless-stopped
+
+networks:
+  nestjs-e2e-network:
+    name: nestjs-e2e-network
+
+volumes:
+  nestjs-e2e-postgres-volume:
+    name: nestjs-e2e-postgres-volume
