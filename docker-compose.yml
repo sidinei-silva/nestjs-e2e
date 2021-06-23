@@ -23,6 +23,25 @@ services:
       - nestjs-e2e-network
     restart: unless-stopped
 
+  postgres:
+    image: postgres:12
+    container_name: nestjs-e2e-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - ${DB_PORT}:5432
+    networks:
+      - nestjs-e2e-network
+    volumes:
+      - nestjs-e2e-postgres-volume:/data
+    restart: unless-stopped
+
 networks:
   nestjs-e2e-network:
     name: nestjs-e2e-network
+
+volumes:
+  nestjs-e2e-postgres-volume:
+    name: nestjs-e2e-postgres-volume
